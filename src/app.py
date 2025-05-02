@@ -1,7 +1,7 @@
 import json
 from flask import Flask, request, render_template, send_from_directory
-from src import db
-from src.db import DatabaseDriver
+import db
+from db import DatabaseDriver
 
 DB = DatabaseDriver()
 
@@ -121,6 +121,6 @@ def get_food_items_by_dining_hall(hall_id):
     return json.dumps({"food_items": result}), 200
 
 if __name__ == "__main__":
-    from src import setup_test_data
-    setup_test_data.run()
+    # from src import setup_test_data
+    # setup_test_data.run()
     app.run(host="0.0.0.0", port=5000, debug=True)

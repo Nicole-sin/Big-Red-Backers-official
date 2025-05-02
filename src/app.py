@@ -1,7 +1,7 @@
 import json
 from flask import Flask, request, render_template, send_from_directory
-import db
-from db import DatabaseDriver
+from src import db
+from src.db import DatabaseDriver
 
 DB = DatabaseDriver()
 

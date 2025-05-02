@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Write a Review</title>
+  <meta charset="UTF-8">
+  <style>
+    body { font-family: sans-serif; padding: 2rem; background: #fffaf5; }
+    label { display: block; margin-top: 1rem; }
+    textarea, input, select { width: 100%; padding: 0.5rem; margin-top: 0.25rem; border-radius: 6px; border: 1px solid #ccc; }
+    button { margin-top: 1.5rem; background: #b44b44; color: white; border: none; padding: 0.75rem 1.5rem; border-radius: 6px; cursor: pointer; }
+    .submitted { background: #f0fff0; border: 1px solid #ccc; margin-top: 2rem; padding: 1rem; border-radius: 10px; }
+  </style>
+</head>
+<body>
+  <h1>Write a Review</h1>
+
+  <form id="reviewForm">
+    <label>Food ID:
+      <input type="number" id="food_id" required />
+    </label>
+
+    <label>Dining Hall ID:
+      <input type="number" id="dining_hall_id" required />
+    </label>
+
+    <label>Rating (1-5):
+      <input type="number" id="rating" min="1" max="5" required />
+    </label>
+
+    <label>Message:
+      <textarea id="message" rows="4" required></textarea>
+    </label>
+
+    <button type="submit">Submit Review</button>
+  </form>
+
+  <div id="output" class="submitted" style="display:none"></div>
+
+  <script>
+    document.getElementById("reviewForm").onsubmit = async function(event) {
+      event.preventDefault();
+
+      const body = {
+        user_id: 1,
+        food_id: parseInt(document.getElementById("food_id").value),
+        dining_hall_id: parseInt(document.getElementById("dining_hall_id").value),
+        rating: parseInt(document.getElementById("rating").value),
+        message: document.getElementById("message").value,
+        recommended_foods: []
+      };
+
+      const res = await fetch("/api/reviews/", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(body)
+      });
+
+      const data = await res.json();
+      const out = document.getElementById("output");
+      out.style.display = "block";
+      out.innerHTML = `
+        <h3>Review Submitted!</h3>
+        <p><strong>Food ID:</strong> ${body.food_id}</p>
+        <p><strong>Dining Hall ID:</strong> ${body.dining_hall_id}</p>
+        <p><strong>Rating:</strong> ${body.rating}</p>
+        <p><strong>Message:</strong> ${body.message}</p>
+      `;
+    }
+  </script>
+
+  <nav style="position: fixed; bottom: 0; left: 0; right: 0; background: white; display: flex; justify-content: space-around; border-top: 1px solid #ccc; padding: 10px;">
+    <a href="/" style="text-decoration: none; color: black;">Search</a>
+    <a href="write_review.html" style="text-decoration: none; color: #b44b44; font-weight: bold;">New Review</a>
+    <a href="profile.html" style="text-decoration: none; color: black;">Profile</a>
+    <a href="favorites.html" style="text-decoration: none; color: black;">Favorites</a>
+  </nav>
+</body>
+</html>

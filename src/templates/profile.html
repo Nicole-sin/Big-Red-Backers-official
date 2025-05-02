@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Profile</title>
+    <meta charset="UTF-8">
+    <script>
+        async function loadUserReviews() {
+            const userId = 1;  // Hardcoded for now
+            const res = await fetch(`/api/users/${userId}/reviews/`);
+            const data = await res.json();
+            const reviews = data.reviews;
+            document.getElementById("reviewCount").textContent = reviews.length;
+            const container = document.getElementById("reviews");
+            container.innerHTML = "";
+            reviews.forEach(review => {
+                const card = document.createElement("div");
+                card.style.border = "1px solid #ccc";
+                card.style.borderRadius = "12px";
+                card.style.padding = "16px";
+                card.style.marginBottom = "20px";
+                card.style.backgroundColor = "#fff";
+
+                const title = document.createElement("h3");
+                title.textContent = `${review.food_item.name} (${review.dining_hall.name})`;
+
+                const stars = document.createElement("p");
+                stars.textContent = `${"\u2B50".repeat(review.rating)} ${review.rating.toFixed(1)} stars`;
+
+                const msg = document.createElement("p");
+                msg.textContent = review.message;
+
+                card.appendChild(title);
+                card.appendChild(stars);
+                card.appendChild(msg);
+                container.appendChild(card);
+            });
+        }
+
+        window.onload = loadUserReviews;
+    </script>
+</head>
+<body style="font-family: sans-serif; background-color: #fdf6f1; margin: 20px;">
+    <div style="text-align: center;">
+        <h1 style="background-color: #b44b44; color: white; padding: 12px;">Profile</h1>
+        <img src="https://via.placeholder.com/100" alt="Avatar" style="border-radius: 50%; margin-top: 20px;">
+        <h2>Bigbacker1101</h2>
+        <p><strong id="reviewCount">0</strong> Reviews</p>
+    </div>
+
+    <h2 style="margin-top: 40px;">Past Reviews</h2>
+    <div id="reviews" style="max-width: 600px; margin: 0 auto;"></div>
+
+    <nav style="position: fixed; bottom: 0; left: 0; right: 0; background: white; display: flex; justify-content: space-around; border-top: 1px solid #ccc; padding: 10px;">
+        <a href="/" style="text-decoration: none; color: black;">Search</a>
+        <a href="write_review.html" style="text-decoration: none; color: black;">New Review</a>
+        <a href="profile.html" style="text-decoration: none; color: #b44b44; font-weight: bold;">Profile</a>
+        <a href="favorites.html" style="text-decoration: none; color: black;">Favorites</a>
+    </nav>
+</body>
+</html>

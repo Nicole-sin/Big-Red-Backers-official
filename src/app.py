@@ -1,5 +1,5 @@
 import json
-from flask import Flask, request
+from flask import Flask, request, render_template, send_from_directory
 import db
 from db import DatabaseDriver
 
@@ -8,6 +8,27 @@ DB = DatabaseDriver()
 app = Flask(__name__)
 with app.app_context():
     db.create_all()
+
+@app.route("/")
+def home():
+    return render_template("index.html")
+
+@app.route("/write_review.html")
+def write_review():
+    return render_template("write_review.html")
+
+@app.route("/profile.html")
+def profile():
+    return render_template("profile.html")
+
+@app.route("/favorites.html")
+def favorites():
+    return render_template("favorites.html")
+
+@app.route("/dish")
+def dish():
+    return render_template("dish.html")
+
 
 @app.route("/api/reviews/", methods=["GET"])
 def get_all_reviews():

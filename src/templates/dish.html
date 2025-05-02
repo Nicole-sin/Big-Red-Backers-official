@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Dish Profile</title>
+    <script>
+        async function loadDish() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const dishId = urlParams.get('id');
+            if (!dishId) return;
+
+            const reviewsRes = await fetch("/api/reviews/");
+            const reviewsData = await reviewsRes.json();
+
+            const allReviews = reviewsData.reviews;
+            const reviews = allReviews.filter(r => r.food_id == dishId);
+            const dish = reviews[0]?.food_item || { name: "", image: "", id: dishId };
+
+            document.getElementById("dish-name").textContent = dish.name;
+            document.getElementById("dish-img").src = dish.image;
+            document.getElementById("review-list").innerHTML = reviews.map(r => `
+                <div style="padding: 1em; margin: 1em 0; border: 1px solid #ccc; border-radius: 10px;">
+                    <strong>User ${r.user_id}</strong> - <span>${r.rating} stars</span>
+                    <p>${r.message}</p>
+                </div>
+            `).join("");
+        }
+
+        async function postReview() {
+            const userId = 1;
+            const foodId = new URLSearchParams(window.location.search).get("id");
+            const diningHallId = 1;
+            const rating = document.getElementById("rating").value;
+            const message = document.getElementById("message").value;
+
+            const res = await fetch("/api/reviews/", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ user_id: userId, food_id: foodId, dining_hall_id: diningHallId, rating, message, recommended_foods: [] })
+            });
+
+            const result = await res.json();
+            alert(result.message);
+            location.reload();
+        }
+
+        window.onload = loadDish;
+    </script>
+</head>
+<body style="font-family: Arial; padding: 2em;">
+    <h1 id="dish-name">Loading...</h1>
+    <img id="dish-img" src="" style="width: 300px; border-radius: 10px;">
+
+    <h2>Leave a Review</h2>
+    <label>Rating: <input id="rating" type="number" min="1" max="5"></label><br><br>
+    <textarea id="message" rows="4" cols="50" placeholder="Write your thoughts..."></textarea><br><br>
+    <button onclick="postReview()">Submit Review</button>
+
+    <h2>Reviews</h2>
+    <div id="review-list"></div>
+
+    <br><a href="/">Back to Home</a>
+</body>
+</html>

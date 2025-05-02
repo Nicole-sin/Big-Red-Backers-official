@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Favorites</title>
+    <meta charset="UTF-8">
+    <style>
+        body { font-family: Arial, sans-serif; background-color: #fffaf5; margin: 20px; }
+        h1 { background-color: #aa4a44; color: white; padding: 1rem; text-align: center; }
+        .card {
+            background-color: white;
+            border-radius: 10px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            padding: 16px;
+            margin-bottom: 16px;
+        }
+        .card img {
+            width: 100%;
+            max-height: 200px;
+            object-fit: cover;
+            border-radius: 6px;
+        }
+        .nav {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: white;
+            display: flex;
+            justify-content: space-around;
+            border-top: 1px solid #ccc;
+            padding: 10px;
+        }
+        .nav a { text-decoration: none; color: black; }
+        .nav a.active { color: #aa4a44; font-weight: bold; }
+    </style>
+</head>
+<body>
+    <h1>Favorites</h1>
+
+    <div id="favorites-container"></div>
+
+    <div class="nav">
+        <a href="/">Search</a>
+        <a href="write_review.html">New Review</a>
+        <a href="profile.html">Profile</a>
+        <a href="favorites.html" class="active">Favorites</a>
+    </div>
+
+    <script>
+        const favoriteIds = [1, 3, 5]; // Pretend favorites list for now
+
+        fetch("/api/dining-halls/")
+            .then(res => res.json())
+            .then(data => {
+                const dishes = data.dining_halls.flatMap(hall =>
+                    hall.food_items.map(item => ({
+                        ...item,
+                        hallName: hall.name
+                    }))
+                );
+
+                const container = document.getElementById("favorites-container");
+                const favorites = dishes.filter(d => favoriteIds.includes(d.id));
+
+                favorites.forEach(dish => {
+                    const card = document.createElement("div");
+                    card.className = "card";
+                    card.innerHTML = `
+                        <img src="/static/${dish.image}" alt="${dish.name}" />
+                        <h3><a href="/dish?id=${dish.id}">${dish.name}</a></h3>
+                        <p>${dish.hallName}</p>
+                    `;
+                    container.appendChild(card);
+                });
+            });
+    </script>
+</body>
+</html>

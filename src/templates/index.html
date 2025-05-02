@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Home - Big Red Backers</title>
+  <style>
+    body { font-family: sans-serif; margin: 20px; background-color: #fef9f4; }
+    h1 { background-color: #b1504b; color: white; padding: 1rem; text-align: center; margin: -20px -20px 1rem -20px; }
+    .dish-card { border: 1px solid #ccc; padding: 1rem; margin-bottom: 1rem; background: white; border-radius: 8px; }
+    .dish-card img { width: 100%; max-height: 200px; object-fit: cover; border-radius: 6px; }
+    .stars { color: #b1504b; }
+  </style>
+</head>
+<body>
+  <h1>Big Red Backers</h1>
+  <input type="text" id="search" placeholder="Search..." oninput="filterDishes()" style="width:100%; padding:10px; margin-bottom:1rem;">
+
+  <div id="dishes"></div>
+
+  <script>
+    let dishes = [];
+
+    async function loadDishes() {
+      const res = await fetch("/api/dining-halls/");
+      const data = await res.json();
+      dishes = data.dining_halls.flatMap(hall => hall.food_items.map(item => ({
+        ...item,
+        hallName: hall.name
+      })));
+      displayDishes(dishes);
+    }
+
+    function displayDishes(dishesToShow) {
+      const container = document.getElementById("dishes");
+      container.innerHTML = "";
+      dishesToShow.forEach(dish => {
+        container.innerHTML += `
+          <div class="dish-card">
+            <img src="/static/${dish.image}" alt="${dish.name}" />
+            <h2><a href="/dish?id=${dish.id}">${dish.name}</a></h2>
+            <p>${dish.hallName}</p>
+          </div>
+        `;
+      });
+    }
+
+    function filterDishes() {
+      const query = document.getElementById("search").value.toLowerCase();
+      const filtered = dishes.filter(d => d.name.toLowerCase().includes(query));
+      displayDishes(filtered);
+    }
+
+    loadDishes();
+  </script>
+
+  <nav style="position: fixed; bottom: 0; left: 0; right: 0; background: white; display: flex; justify-content: space-around; border-top: 1px solid #ccc; padding: 10px;">
+    <a href="/" style="text-decoration: none; color: #b44b44; font-weight: bold;">Search</a>
+    <a href="write_review.html" style="text-decoration: none; color: black;">New Review</a>
+    <a href="profile.html" style="text-decoration: none; color: black;">Profile</a>
+    <a href="favorites.html" style="text-decoration: none; color: black;">Favorites</a>
+  </nav>
+</body>
+</html>

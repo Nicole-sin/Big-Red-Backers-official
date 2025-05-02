@@ -113,5 +113,7 @@ def get_food_items_by_dining_hall(hall_id):
         })
     return json.dumps({"food_items": result}), 200
 
+import setup_test_data
+setup_test_data.run()
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=5000, debug=True)

@@ -13,6 +13,13 @@ with app.app_context():
 def home():
     return render_template("index.html")
 
+@app.route("/api/setup", methods=["POST"])
+def setup_data():
+    import setup_test_data
+    setup_test_data.run()
+    return "Database initialized", 200
+
+
 @app.route("/write_review.html")
 def write_review():
     return render_template("write_review.html")
@@ -114,6 +121,6 @@ def get_food_items_by_dining_hall(hall_id):
     return json.dumps({"food_items": result}), 200
 
 if __name__ == "__main__":
-    import setup_test_data
+    from src import setup_test_data
     setup_test_data.run()
     app.run(host="0.0.0.0", port=5000, debug=True)

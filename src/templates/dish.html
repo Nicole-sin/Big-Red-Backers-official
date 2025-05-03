@@ -3,7 +3,74 @@
 <head>
     <meta charset="UTF-8">
     <title>Dish Profile</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 2em;
+            max-width: 800px;
+            margin: auto;
+        }
+
+        h1, h2 {
+            text-align: center;
+        }
+
+        #dish-img {
+            display: block;
+            margin: 1em auto;
+            max-width: 100%;
+            border-radius: 10px;
+        }
+
+        .review-box {
+            padding: 1em;
+            margin: 1em 0;
+            border: 1px solid #ccc;
+            border-radius: 10px;
+        }
+
+        textarea, input[type="number"] {
+            width: 100%;
+            padding: 0.5em;
+            box-sizing: border-box;
+        }
+
+        button {
+            padding: 0.6em 1.2em;
+            font-size: 1em;
+            margin-top: 1em;
+            cursor: pointer;
+        }
+
+        #review-form {
+            margin-top: 3em;
+        }
+
+        #dish-info {
+            text-align: center;
+            margin-top: -1em;
+            margin-bottom: 1em;
+            color: #555;
+        }
+
+        .stars {
+            color: #FFD700;
+            font-size: 1.1em;
+        }
+
+        a {
+            display: block;
+            text-align: center;
+            margin-top: 2em;
+            text-decoration: none;
+            color: #0066cc;
+        }
+    </style>
     <script>
+        function generateStars(rating) {
+            return '⭐'.repeat(Math.round(rating));
+        }
+
         async function loadDish() {
             const urlParams = new URLSearchParams(window.location.search);
             const dishId = urlParams.get('id');
@@ -17,10 +84,20 @@
             const dish = reviews[0]?.food_item || { name: "", image: "", id: dishId };
 
             document.getElementById("dish-name").textContent = dish.name;
-            document.getElementById("dish-img").src = dish.image;
+            document.getElementById("dish-img").src = `/static/${dish.image}`;
+
+            const totalReviews = reviews.length;
+            const avgRating = totalReviews
+                ? (reviews.reduce((sum, r) => sum + r.rating, 0) / totalReviews).toFixed(1)
+                : null;
+
+            document.getElementById("dish-info").innerHTML = totalReviews
+                ? `Average Rating: ${avgRating} <span class="stars">${generateStars(avgRating)}</span> | ${totalReviews} Review${totalReviews > 1 ? 's' : ''}`
+                : `No reviews yet`;
+
             document.getElementById("review-list").innerHTML = reviews.map(r => `
-                <div style="padding: 1em; margin: 1em 0; border: 1px solid #ccc; border-radius: 10px;">
-                    <strong>User ${r.user_id}</strong> - <span>${r.rating} stars</span>
+                <div class="review-box">
+                    <span class="stars">${generateStars(r.rating)}</span>
                     <p>${r.message}</p>
                 </div>
             `).join("");
@@ -36,7 +113,14 @@
             const res = await fetch("/api/reviews/", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ user_id: userId, food_id: foodId, dining_hall_id: diningHallId, rating, message, recommended_foods: [] })
+                body: JSON.stringify({
+                    user_id: userId,
+                    food_id: foodId,
+                    dining_hall_id: diningHallId,
+                    rating,
+                    message,
+                    recommended_foods: []
+                })
             });
 
             const result = await res.json();
@@ -47,18 +131,27 @@
         window.onload = loadDish;
     </script>
 </head>
-<body style="font-family: Arial; padding: 2em;">
+<body>
     <h1 id="dish-name">Loading...</h1>
-    <img id="dish-img" src="" style="width: 300px; border-radius: 10px;">
+    <p id="dish-info"></p>
+    <img id="dish-img" src="" alt="Dish image">
 
-    <h2>Leave a Review</h2>
-    <label>Rating: <input id="rating" type="number" min="1" max="5"></label><br><br>
-    <textarea id="message" rows="4" cols="50" placeholder="Write your thoughts..."></textarea><br><br>
-    <button onclick="postReview()">Submit Review</button>
+    <div id="review-form">
+        <h2>Leave a Review</h2>
+        <label for="rating">Rating (1-5):</label>
+        <input id="rating" type="number" min="1" max="5"><br><br>
 
-    <h2>Reviews</h2>
-    <div id="review-list"></div>
+        <label for="message">Your Review:</label>
+        <textarea id="message" rows="4" placeholder="Write your thoughts..."></textarea><br>
 
-    <br><a href="/">Back to Home</a>
+        <button onclick="postReview()">Submit Review</button>
+    </div>
+
+    <div id="reviews-section">
+        <h2>Reviews</h2>
+        <div id="review-list"></div>
+    </div>
+
+    <a href="/">Back to Home</a>
 </body>
 </html>

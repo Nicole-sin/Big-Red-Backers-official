@@ -13,13 +13,6 @@ with app.app_context():
 def home():
     return render_template("index.html")
 
-@app.route("/api/setup", methods=["POST"])
-def setup_data():
-    import setup_test_data
-    setup_test_data.run()
-    return "Database initialized", 200
-
-
 @app.route("/write_review.html")
 def write_review():
     return render_template("write_review.html")
@@ -39,11 +32,17 @@ def dish():
 
 @app.route("/api/reviews/", methods=["GET"])
 def get_all_reviews():
+    """
+     returns a list of all reviews in the system
+    """
     reviews = DB.get_all_reviews()
     return json.dumps({"reviews": reviews}), 200
 
 @app.route("/api/reviews/", methods=["POST"])
 def post_review():
+    """
+    creates a new review. 
+    """
     body = json.loads(request.data)
     user_id = body.get("user_id")
     food_id = body.get("food_id")
@@ -74,6 +73,9 @@ def post_review():
 
 @app.route("/api/reviews/<int:review_id>/", methods=["DELETE"])
 def delete_review(review_id):
+    """
+     deletes a review by its id. if the review doesn’t exist, you get a 404.
+    """
     review = DB.get_review(review_id)
     
     if not review:
@@ -83,11 +85,17 @@ def delete_review(review_id):
     return json.dumps({"message": f"Review {review_id} deleted successfully"}), 200
 @app.route("/api/dining-halls/", methods=["GET"])
 def get_all_dining_halls():
+    """
+    returns all the dining halls in the database.
+    """
     dining_halls = DB.get_all_dining_halls()
     return json.dumps({"dining_halls": dining_halls}), 200
 
 @app.route("/api/users/<int:user_id>/reviews/", methods=["GET"])
 def get_reviews_by_user(user_id):
+    """
+    creates a new user
+    """
     user = DB.get_user(user_id)
     if not user:
         return json.dumps({"error": "User not found"}), 404
@@ -97,7 +105,9 @@ def get_reviews_by_user(user_id):
 @app.route("/api/users/", methods=["POST"])
 def create_user():
     new_user_id = DB.create_user()
-    
+    """
+     gets all reviews written by a specific user. returns an error if the user doesn’t exist.
+    """
     return json.dumps({
         "id": new_user_id,
         "message": "User created successfully"
@@ -105,6 +115,9 @@ def create_user():
 
 @app.route("/api/dining-halls/<int:hall_id>/food-items/", methods=["GET"])
 def get_food_items_by_dining_hall(hall_id):
+    """
+     gets all food item by the dining hall its in
+    """
     hall = DB.get_dining_hall(hall_id)
     if not hall:
         return json.dumps({"error": "Dining hall not found"}), 404
